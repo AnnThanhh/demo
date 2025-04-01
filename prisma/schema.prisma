@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Auction {
+  id         Int       @id @default(autoincrement())
+  productId  Int       @unique(map: "productId")
+  startPrice Float     @db.Float
+  currentBid Float?    @db.Float
+  endTime    DateTime  @db.DateTime(0)
+  createdAt  DateTime? @default(now()) @db.DateTime(0)
+  Product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Auction_ibfk_1")
+  Bid        Bid[]
+}
+
+model Bid {
+  id        Int       @id @default(autoincrement())
+  auctionId Int
+  userId    Int
+  amount    Float     @db.Float
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  Auction   Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Bid_ibfk_1")
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Bid_ibfk_2")
+
+  @@index([auctionId], map: "auctionId")
+  @@index([userId], map: "userId")
+}
+
+model CartItem {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  productId Int
+  quantity  Int?      @default(1)
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "CartItem_ibfk_1")
+  Product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "CartItem_ibfk_2")
+
+  @@index([productId], map: "productId")
+  @@index([userId], map: "userId")
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  title       String     @db.VarChar(255)
+  description String?    @db.Text
+  price       Float      @db.Float
+  imageUrl    String?    @db.VarChar(255)
+  userId      Int
+  createdAt   DateTime?  @default(now()) @db.DateTime(0)
+  updatedAt   DateTime?  @default(now()) @db.DateTime(0)
+  Auction     Auction?
+  CartItem    CartItem[]
+  User        User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Product_ibfk_1")
+
+  @@index([userId], map: "userId")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique(map: "email") @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  name      String?    @db.VarChar(255)
+  createdAt DateTime?  @default(now()) @db.DateTime(0)
+  updatedAt DateTime?  @default(now()) @db.DateTime(0)
+  Bid       Bid[]
+  CartItem  CartItem[]
+  Product   Product[]
+}
