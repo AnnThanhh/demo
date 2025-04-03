@@ -61,13 +61,35 @@ model Product {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique(map: "email") @db.VarChar(255)
-  password  String     @db.VarChar(255)
-  name      String?    @db.VarChar(255)
-  createdAt DateTime?  @default(now()) @db.DateTime(0)
-  updatedAt DateTime?  @default(now()) @db.DateTime(0)
-  Bid       Bid[]
-  CartItem  CartItem[]
-  Product   Product[]
+  id        Int       @id @default(autoincrement())
+  email     String    @unique(map: "email") @db.VarChar(255)
+  password  String    @db.VarChar(255)
+  name      String?   @db.VarChar(255)
+  phone     String?   @db.VarChar(20)
+  address   String?   @db.Text
+  avatarUrl String?   @db.Text
+  dob       DateTime? @db.Date
+  gender    Gender?   @default(male)
+  role      Role?     @default(user)
+  isActive  Boolean?  @default(true)
+  lastLogin DateTime? @db.DateTime(0)
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  updatedAt DateTime? @default(now()) @db.DateTime(0)
+
+  // Relations
+  Bid      Bid[]
+  CartItem CartItem[]
+  Product  Product[]
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum Role {
+  user
+  admin
+  moderator
 }

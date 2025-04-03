@@ -14,7 +14,8 @@ export class ProductsController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: ProductDto })
   async create(@Body() body: CreateProductDto): Promise<ProductDto> {
-    return this.productsService.create(body); // ✅ Truyền toàn bộ object
+    console.log(body);
+    return this.productsService.create(body);
   }
 
   @Get()

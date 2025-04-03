@@ -7,8 +7,15 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateProductDto): Promise<ProductDto> {
+    console.log(data); // Log the data being passed in
     return this.prisma.product.create({
-      data,
+      data: {
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        userId: data.userId,
+        imageUrl: data.imageUrl || null,
+      },
       include: {
         User: {
           select: {

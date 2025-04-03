@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
-import { UserWithPassword, UserResponse } from '../users/users.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -11,14 +11,16 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<UserResponse> {
-    const user: UserWithPassword | null =
-      await this.usersService.findByEmail(email);
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<Omit<User, 'password'>> {
+    const user = await this.usersService.findByEmail(email);
 
     const isPasswordValid = user && (await bcrypt.compare(password, user.password));
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Thông tin không hợp lệ');
     }
 
     const { password: _, ...safeUser } = user;
